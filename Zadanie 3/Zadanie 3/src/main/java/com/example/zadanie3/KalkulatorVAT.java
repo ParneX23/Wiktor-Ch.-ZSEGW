@@ -1,14 +1,12 @@
 package com.example.zadanie3;
 
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -54,19 +52,49 @@ public class KalkulatorVAT extends Application {
         daneLabel.setPadding(new Insets(-30, -10, 0, 0));
         daneLabel.getGraphic().setStyle("-fx-background-color: #f4f4f4;");
 
+        Label wartoscLabel = new Label("Wartość bazowa:");
+
+        TextField wartosc = new TextField();
+
+
+        Label vatLabel = new Label("Stawka VAT:");
+
         ChoiceBox<String> vat = new ChoiceBox<String>();
+        ObservableList<String> oslist = vat.getItems();
+        oslist.addAll("4%","5%","7%","8%","23%");
 
         GridPane danePane = new GridPane();
         danePane.setVgap(5);
         danePane.setHgap(5);
         danePane.setPadding(new Insets(15));
         danePane.add(daneLabel, 0, 0);
-
+        danePane.add(wartoscLabel, 0, 1);
+        danePane.add(wartosc, 1, 1);
+        danePane.add(vatLabel, 0, 2);
+        danePane.add(vat, 1, 2);
         danePane.setStyle("-fx-border-style: solid inside;");
         danePane.setStyle("-fx-border-width: 1;");
         danePane.setStyle("-fx-border-insets: 1;");
         danePane.setStyle("-fx-border-radius: 1;");
         danePane.setStyle("-fx-border-color: gray;");
+
+
+
+        Label wynikiLabel = new Label();
+        wynikiLabel.setGraphic(new Label(" Wyniki: "));
+        wynikiLabel.setPadding(new Insets(-30, -10, 0, 0));
+        wynikiLabel.getGraphic().setStyle("-fx-background-color: #f4f4f4;");
+
+        GridPane wynikiPane = new GridPane();
+        wynikiPane.setVgap(5);
+        wynikiPane.setHgap(5);
+        wynikiPane.setPadding(new Insets(15));
+        wynikiPane.add(wynikiLabel, 0, 0);
+        wynikiPane.setStyle("-fx-border-style: solid inside;");
+        wynikiPane.setStyle("-fx-border-width: 1;");
+        wynikiPane.setStyle("-fx-border-insets: 1;");
+        wynikiPane.setStyle("-fx-border-radius: 1;");
+        wynikiPane.setStyle("-fx-border-color: gray;");
 
         GridPane main = new GridPane();
         main.setPadding(new Insets(10,10,10,10));
@@ -77,6 +105,7 @@ public class KalkulatorVAT extends Application {
 
         main.add(metodaPane, 0,0);
         main.add(danePane, 0, 1);
+        main.add(wynikiPane, 0, 2);
 
         Scene scene = new Scene(main, 500, 300);
         stage.setTitle("Kalkulator VAT netto-brutto");
