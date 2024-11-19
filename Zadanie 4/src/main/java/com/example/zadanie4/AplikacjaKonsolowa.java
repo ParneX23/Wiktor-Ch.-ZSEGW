@@ -33,6 +33,10 @@ public class AplikacjaKonsolowa extends Application {
     private final int minWynik = 3;
     private final int maxWynik = 10;
 
+    // Zmienne
+
+    private int liczbaLosowan = 0;
+
     // Funkcja odpowiedzialna za losowanie kości
 
     public int[] rzut(int ilosc) {
@@ -68,21 +72,26 @@ public class AplikacjaKonsolowa extends Application {
         Label iloscLabel = new Label("Podaj ilość rzucanych kości");
         TextField iloscKosci = new TextField();
         Button losuj = new Button("losuj");
-        Label wynikLabel = new Label("Wynik : ");
+        Button resetuj = new Button("resetuj");
+        Label wynikLabel = new Label("Łączny wynik : ");
         Label wynik = new Label("0");
 
         sterowanie.add(iloscLabel, 0,0);
         sterowanie.add(iloscKosci,1,0);
         sterowanie.add(losuj,0,1);
+        sterowanie.add(resetuj,1,1);
         sterowanie.add(wynikLabel, 0, 2);
         sterowanie.add(wynik, 1, 2);
 
         // Panel kości
-
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setPrefSize(300,200);
         GridPane kosci = new GridPane();
         kosci.setPadding(new Insets(10,10,10,10));
         kosci.setVgap(5);
         kosci.setHgap(5);
+
+        scrollPane.setContent(kosci);
 
         // Panel główny
 
@@ -94,24 +103,30 @@ public class AplikacjaKonsolowa extends Application {
         main.setHgap(5);
 
         main.add(sterowanie, 0, 0);
-        main.add(kosci, 0,1);
+        main.add(scrollPane, 0,1);
 
         // Funkcjonalność przycisku losuj
 
         losuj.setOnMouseClicked((new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                kosci.getChildren().clear();
+                //kosci.getChildren().clear();
                 if(Integer.parseInt(iloscKosci.getText()) >= minIloscKosci && Integer.parseInt(iloscKosci.getText()) <= maxIloscKosci){
                     int[] wylosowane = rzut(Integer.parseInt(iloscKosci.getText()));
-                    for(int i = 0; i < wylosowane.length; i++){
-                        try {
-                            kosci.add(new ImageView(new Image(new FileInputStream(String.valueOf(wylosowane[i])+".png"), 20, 20, true, false )),0+i,0);
-                        } catch (FileNotFoundException e) {
-                            throw new RuntimeException(e);
+                    liczbaLosowan++;
+                    for(int i = 0; i <= wylosowane.length; i++){
+                        if(i == wylosowane.length){
+                            kosci.add(new Label(String.valueOf(licz(wylosowane))), 0+i, 0+liczbaLosowan);
+                        } else {
+                            try {
+                                kosci.add(new ImageView(new Image(new FileInputStream(String.valueOf(wylosowane[i])+".png"), 20, 20, true, false )),0+i,0+liczbaLosowan);
+                            } catch (FileNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                     }
-                    wynik.setText(String.valueOf(licz(wylosowane)));
+
+                    wynik.setText(String.valueOf(Integer.valueOf(wynik.getText())+licz(wylosowane)));
                     if(licz(wylosowane) >= minWynik && licz(wylosowane) <= maxWynik) {
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle("Dobry wynik");
@@ -140,9 +155,18 @@ public class AplikacjaKonsolowa extends Application {
             }
         }));
 
+        resetuj.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                liczbaLosowan = 0;
+                wynik.setText("0");
+                kosci.getChildren().clear();
+            }
+        });
+
         // Scena 
 
-        Scene scene = new Scene(main, 350, 150);
+        Scene scene = new Scene(main, 350, 300);
         stage.setTitle("Kości");
         stage.setScene(scene);
         stage.show();
