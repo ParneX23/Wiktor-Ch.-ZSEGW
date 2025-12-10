@@ -51,6 +51,23 @@ def pobierz_biblioteke():
         cursor.close()
         conn.close()
 
+def pobierz_biblioteke2(tytul):
+    conn = dbcon()
+    if conn is None: return []
+
+    cursor = conn.cursor()
+    sql = "SELECT id, tytul, rezyser, rok, ocena FROM filmy WHERE tytul LIKE '%"+str(tytul)+"%'"
+    try:
+        cursor.execute(sql)
+        wyniki = cursor.fetchall()
+        return wyniki
+    except mysql.connector.Error as err:
+        messagebox.showerror("Błąd", f"Wystąpił błąd podczas pobierania biblioteki filmów: {err}")
+        return []
+    finally:
+        cursor.close()
+        conn.close()
+
 def aktualizuj(id, tytul, rezyser, rok, ocena):
     conn = dbcon()
     if conn is None: return
@@ -73,6 +90,22 @@ def aktualizuj(id, tytul, rezyser, rok, ocena):
 #
 # --- FUNKCJE GUI ---
 #
+def odswiez_treeview(tree):
+    for item in tree.get_children():
+        tree.delete(item)
+    dane = pobierz_biblioteke()
+    for wiersz in dane:
+        tree.insert('', tk.END, values=wiersz)
+
+def obsluga_wyszukiwania(tree):
+    szukane = search_var.get()
+    messagebox.showwarning("Uwaga", "Szukamy . . .")
+    for item in tree.get_children():
+        tree.delete(item)
+    dane = pobierz_biblioteke2(str(szukane))
+    for wiersz in dane:
+        tree.insert('', tk.END, values=wiersz)
+
 def obsluga_aktualizacji(event):
     selected = tree.focus()
     if not selected:
@@ -140,13 +173,6 @@ def obsluga_aktualizacji(event):
 
     ttk.Button(win, text="Zapisz", command=zmien).grid(row=5, column=0, columnspan=2, pady=10)
     odswiez_treeview(tree)
-
-def odswiez_treeview(tree):
-    for item in tree.get_children():
-        tree.delete(item)
-    dane = pobierz_biblioteke()
-    for wiersz in dane:
-        tree.insert('', tk.END, values=wiersz)
 
 def obsluga_dodawania(tytul_var, rezyser_var, rok_var, ocena_var, tree):
     tytul = tytul_var.get()
@@ -231,11 +257,6 @@ def obsluga_usuwania():
         conn.close()
         odswiez_treeview(tree)
 
-def obsluga_wyszukiwania(search_var):
-    selected = tree.focus()
-    if not selected:
-        return
-
 # --- KONFIGURACJA GŁÓWNEGO OKNA ---
 
 root = tk.Tk()
@@ -274,10 +295,10 @@ usun_btn = ttk.Button(form_frame, text="Usuń Film",
 usun_btn.grid(row=4, column=1, pady=10)
 
 ttk.Label(form_frame, text="Szukaj po tytule :").grid(row=4, column=2, padx=5, pady=5, sticky='w')
-ttk.Entry(form_frame, textvariable=search_var, width=20).grid(row=4, column=3, padx=5, pady=5, sticky='w')
-usun_btn = ttk.Button(form_frame, text="🔎",
-    command=lambda: obsluga_wyszukiwania(search_var))
-usun_btn.grid(row=4, column=4)
+ttk.Entry(form_frame, textvariable=search_var, width=29).grid(row=4, column=3, padx=5, pady=5, sticky='w')
+szukaj_btn = ttk.Button(form_frame, text="🔎",
+    command=lambda: obsluga_wyszukiwania(tree))
+szukaj_btn.grid(row=4, column=4)
 
 
 # --- Sekcja wyświetlania danych (Treeview) ---
